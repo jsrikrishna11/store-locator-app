@@ -15,8 +15,9 @@ const mapStyles = {
 /**------------------------------------------------------------------- */
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) =>{
-  let id = 0;
+  let id = 1;
   let icon ="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
+
   return(
   <GoogleMap 
     defaultZoom={13}
