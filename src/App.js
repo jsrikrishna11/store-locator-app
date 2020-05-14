@@ -15,7 +15,7 @@ const mapStyles = {
 /**------------------------------------------------------------------- */
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) =>{
-  let id = 1;
+  let id = 0;
   let icon ="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
 
   return(
