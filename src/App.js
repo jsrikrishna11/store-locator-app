@@ -9,23 +9,28 @@ import {LoadScript, GoogleMap, Marker, InfoWindow} from "@react-google-maps/api"
 let ICON ="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
 let infoID = 0;
 let markID = 0;
+const centre = {
+  lat: 42.4072,
+  lng: -71.3824
+}
 /**------------------------------------------------------------------- */
 
 function MarkerWithWindow(props){
-  let [notWindowOpen, changeWinState ] = useState(false)
+  let [isWindowOpen, changeWinState ] = useState(false)
   return(
     <React.Fragment key={markID++}>
-    <Marker key={props.store.id} position={props.store.geometry.location}
+    <Marker key={props.store.id} position={props.position}
           icon= {ICON}
-          onClick={()=> changeWinState(!notWindowOpen)}
+          onClick={()=> changeWinState(!isWindowOpen)}
         >
         </Marker>
-    {notWindowOpen && <InfoWindow position={props.position} key={props.store.place_id} 
+    {isWindowOpen && <InfoWindow position={props.position} key={infoID++} 
     onCloseClick={()=> changeWinState(false)}>
       <div>
-        Name: {props.store.name}<br/>
-        Rating : {props.store.rating}<br/>
-        Address: {props.store.formatted_address}
+        Name: {props.store.companyname}<br/>
+        Address: {props.store.address}<br/>
+        City: {props.store.city}<br/>
+        State: {props.store.state}
       </div>
     </InfoWindow>}
     </React.Fragment>
@@ -47,21 +52,18 @@ function App() {
     console.log("latitude changed!")
   }, [latitude, longitude])
 
-  const findStores = () =>{
-    console.log("I will find stores now!");
-    let storename = document.querySelector("#name").value;
 
-    console.log(storename);
-    let radius = document.querySelector("#radius").value;
-    const HEROKU = "https://cors-anywhere.herokuapp.com/";
-    const GOOGLE = "https://maps.googleapis.com/maps/api/place/textsearch/json?query="
-    console.log(radius);
-    fetch(HEROKU+GOOGLE+`${storename}&location=${latitude},${longitude}&radius=${radius}&key=${process.env.REACT_APP_MAPBOX_TOKEN}`, 
-    { headers:{'X-Requested-With':'application/x-yaml'}}).then(respose => respose.json() )
-    .then(data =>{
-      setStores(data.results)
-      console.log("changing stores values")
-    } )
+  const sendToNode = () =>{
+
+    console.log("in the even sendToNode")
+    const zip = document.querySelector("#zip").value;
+    fetch(`http://localhost:3000/?zip=${zip}`).then(res => res.json())
+    .then(stores => {
+      if(stores === []) alert("Please try again now!")
+      else setStores(stores)
+    
+    })
+
   }
   
 
@@ -78,12 +80,8 @@ function App() {
           width: '100vmax',
           height: '400px'
         }}
-        center={{
-          lat: lat,
-          lng: lng
-        }}
+        center={centre}
         zoom={13}
-        
       >
         <Marker key={"retghnbvcxskmnvbc"}
           position={
@@ -98,21 +96,22 @@ function App() {
         stores.map((store, index) => {
           return (
         <React.Fragment key={index}>
-            <MarkerWithWindow key={store.id} position={store.geometry.location} store={store} />
+            <MarkerWithWindow key={"child"+toString(index)} position={{lat: parseFloat(store.lat), lng: parseFloat(store.lng)}} store={store} />
         </React.Fragment>
         )}
       )}
       </GoogleMap>
     </LoadScript>
         
-        <input type={"text"} placeholder={"Enter store here"} id={"name"}/> 
-       <input type={"text"} placeholder={"Radius"} id={"radius"}/> 
-       <button onClick={findStores} >Find stores</button>
+        <input type={"text"} placeholder={"Zip Code Here"} id={"zip"}/> 
+       {/* <input type={"text"} placeholder={"Radius"} id={"radius"}/>  */}
+       <button onClick={sendToNode} >Find stores</button>
     </>
       )
     }
   return (
     <React.Fragment key={infoID++}>
+      {console.log("rendering")}
     {console.log(lat+" "+ lng)}
      
 
@@ -123,10 +122,7 @@ function App() {
           width: '100vmax',
           height: '400px'
         }}
-        center={{
-          lat: lat,
-          lng: lng
-        }}
+        center={centre}
         zoom={13}
         key={"initContainer"}
       >
@@ -143,14 +139,15 @@ function App() {
         </Marker>
       </GoogleMap>
     </LoadScript>
-    <input type={"text"} placeholder={"Enter store here"} id={"name"}/> 
-    <input type={"text"} placeholder={"Radius"} id={"radius"}/> 
-    <button onClick={findStores} id={"findStores"} >Find stores</button>
+    <input type={"text"} placeholder={"Zip Code Here"} id={"zip"}/> 
+    {/* <input type={"text"} placeholder={"Radius"} id={"radius"}/>  */}
+    <button onClick={sendToNode} id={"findStores"} >Find stores</button>
 
     </React.Fragment>
   );
   }
   else{
+    console.log(latitude, longitude)
     return "Allow locations please!"
     
   }
