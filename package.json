@@ -16,6 +16,7 @@
     "react-google-maps": "^9.4.5",
     "react-icons": "^3.10.0",
     "react-scripts": "3.4.1",
+    "react-ui": "^1.0.0-beta.26",
     "recompose": "^0.30.0",
     "sequelize": "^5.21.8",
     "use-position": "^0.0.7"
