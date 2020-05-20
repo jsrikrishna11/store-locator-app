@@ -5,6 +5,7 @@ const url = require('url');
 const querystring = require('querystring');
 const { Sequelize , DataTypes, Op} = require('sequelize');
 const {Client, Status} = require("@googlemaps/google-maps-services-js")
+const distance = require('google-distance-matrix')
 
 
 const key = "AIzaSyDcIChPg5D9yzbTfVUua6sCU22cEDYSMDM"
@@ -74,21 +75,15 @@ console.log("store= "+ Store+ "is this undefined?")
 /*Google maps setup*/
 
 const client = new Client({});
-// client.geocode({
-//   params:{
-//     address: 'GILBERT\'S WRITTEN WO'+" "+'72 CENTER SQUARE',
-//     key: key
-//   },
-//   timeout: 10000,
-// }).then((result)=>{
-//   if(result.data.status === Status.OK){
-//     result.data.results.forEach((location)=> console.log(location.geometry.location));
-//   }
-//   else console.log(result.data.error_message+ " is this undefined");
-// })
-// .catch((e)=>{
-//   console.log(e+" is this undefined?");
-// })
+
+distance.key(key)
+var origins = ['San Francisco CA'];
+var destinations = ['New York NY', '41.8337329,-87.7321554'];
+
+distance.matrix(origins, destinations, function (err, distances) {
+  if (!err)
+      console.log(distances);
+})
 
 
 /* GET home page. */
@@ -158,26 +153,7 @@ router.get('/', function(req, res, next) {
         console.log(responseCoords)
         res.send(JSON.stringify(responseCoords))
       })
-    });
-  // Store.findOne().then((store, error)=>{
-  //   //write updation logic here!
-    
-  //   client.geocode({
-  //     params:{
-  //       address: store.companyname+" "+store.address1+" "+store.city+" "+store.state+" "+store.zip,
-  //       key: key
-  //     },
-  //     timeout: 10000,
-  //   }).then((result)=>{
-  //     if(result.data.status === Status.OK){
-  //       result.data.results.forEach((location)=> console.log(location.geometry.location));
-  //     }
-  //     else console.log(result.data.error_message+ " is this undefined");
-  //   })
-  //   .catch((e)=>{
-  //     console.log(e+" is this undefined?");
-  //   })
-// });
+});
 
 
 module.exports = router;
