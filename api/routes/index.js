@@ -74,7 +74,21 @@ console.log("store= "+ Store+ "is this undefined?")
 /*Google maps setup*/
 
 const client = new Client({});
-
+// client.geocode({
+//   params:{
+//     address: 'GILBERT\'S WRITTEN WO'+" "+'72 CENTER SQUARE',
+//     key: key
+//   },
+//   timeout: 10000,
+// }).then((result)=>{
+//   if(result.data.status === Status.OK){
+//     result.data.results.forEach((location)=> console.log(location.geometry.location));
+//   }
+//   else console.log(result.data.error_message+ " is this undefined");
+// })
+// .catch((e)=>{
+//   console.log(e+" is this undefined?");
+// })
 
 
 /* GET home page. */
@@ -93,22 +107,21 @@ router.get('/', function(req, res, next) {
         }
       } 
     }).then((result, error)=>{
-      console.log(result)
-        result.map(async (store, index)=>{
+        result.map((store, index)=>{
           //for each store I want to check if the lat and lng are there!
           //if they aren't there then use google and update!
           if(store.lat === null || store.lng === null){
             console.log('I entered coz no lat/lng')
-            let gRes = await client.geocode({
+            client.geocode({
               params:{
                 address: store.companyname+' '+store.address1+' '+
                 store.city+' '+store.state+' '+store.country,
                 key: key
               },
-            })
+            }).then((result)=>{
               console.log("got the values from google!")
-              if(gRes.data.status === Status.OK){
-                let position = gRes.data.results[0].geometry.location
+              if(result.data.status === Status.OK){
+                let position = result.data.results[0].geometry.location
                 console.log(position)
                 //updating here!
                 Store.update(position, {
@@ -131,7 +144,7 @@ router.get('/', function(req, res, next) {
                 }
               )
               }
-            
+            })
           }
           else{
             console.log("Lat and lng there!")
